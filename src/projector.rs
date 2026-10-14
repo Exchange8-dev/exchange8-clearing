@@ -383,10 +383,10 @@ pub fn drop_matches(
 ) -> bool {
     let _ = e;
     // Entitlement junctions: a non-empty set filters; empty allows all.
-    if !cfg.customers.is_empty() && customer.map_or(true, |c| !cfg.customers.contains(&c)) {
+    if !cfg.customers.is_empty() && customer.is_none_or(|c| !cfg.customers.contains(&c)) {
         return false;
     }
-    if !cfg.traders.is_empty() && trader.map_or(true, |t| !cfg.traders.contains(&t)) {
+    if !cfg.traders.is_empty() && trader.is_none_or(|t| !cfg.traders.contains(&t)) {
         return false;
     }
     if !cfg.book_tokens.is_empty() && !cfg.book_tokens.contains(&book_id) {
