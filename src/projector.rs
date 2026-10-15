@@ -3,14 +3,14 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:Clearing event projectors — the deterministic order/trade ledger.
-//!
-//! Event-sourced: ME/SOR lifecycle events in → ledger rows out. The projectors
-//! are pure functions of the event stream; the DB write layer and drop-copy
-//! fan-out live in the service shell.
-//!
-//! Design: `design/sentin8-exchange8-clearing-technical-design.md` §4.1–4.2.
-//! Truth: `design/behavior-catalog/messages.json` (update type codes).
+// Ex8:Clearing event projectors — the deterministic order/trade ledger.
+//
+// Event-sourced: ME/SOR lifecycle events in → ledger rows out. The projectors
+// are pure functions of the event stream; the DB write layer and drop-copy
+// fan-out live in the service shell.
+//
+// Design: `design/sentin8-exchange8-clearing-technical-design.md` §4.1–4.2.
+// Truth: `design/behavior-catalog/messages.json` (update type codes).
 
 use exchange8::contracts::enums::{Liquidity, Side};
 use exchange8::contracts::events::{OrderBooked, OrderExecuted, OrderKilled, OrderModified};
