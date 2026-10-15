@@ -1,12 +1,12 @@
-# BUSINESS.md: Ex8:Clearing — Business Requirements & Functionality
+# BUSINESS.md: Exchange8:Clearing — Business Requirements & Functionality
 
 > Audience: product owners, business analysts, and anyone evaluating what
-> Ex8:Clearing **does for the business**. For architecture read `README.md`;
+> Exchange8:Clearing **does for the business**. For architecture read `README.md`;
 > for wire-level detail read `DESIGN.md`.
 
 ## 1. Business Purpose
 
-Ex8:Clearing is the exchange's book of record for every order and trade that
+Exchange8:Clearing is the exchange's book of record for every order and trade that
 happened on the venue. It turns the venue's raw event stream into an
 authoritative, regulator-grade order journal and execution ledger; it lets
 clearing firms watch their firms' activity in real time through drop copies;
@@ -36,15 +36,15 @@ series, regulatory reports, settlement netting, and surveillance analytics.
 
 | Concern | Owner |
 |---|---|
-| Order matching and execution | Ex8:ME |
-| Pre-trade risk checks, shortable flags, margin | Ex8:Risk, Ex8:Margin |
-| Regulatory report formatting/transport | Ex8:Regulatory |
-| CCP novation files, custody, collateral movement, give-up, block trades, EOD settlement exports | Ex8:Settlement |
+| Order matching and execution | Exchange8:ME |
+| Pre-trade risk checks, shortable flags, margin | Exchange8:Risk, Exchange8:Margin |
+| Regulatory report formatting/transport | Exchange8:Regulatory |
+| CCP novation files, custody, collateral movement, give-up, block trades, EOD settlement exports | Exchange8:Settlement |
 | Money movement | Bank8:Ledger |
 | Scheduling of SOD/EOD/purge jobs | Sentin8:Cron |
 | Identity/tokens | Sentin8:Auth |
 | Policy decisions | Shield (sentin8-policy) |
-| Reportable event transport sessions | Ex8:Regulatory |
+| Reportable event transport sessions | Exchange8:Regulatory |
 
 ## 3. Business Capabilities
 
@@ -150,7 +150,7 @@ relayed to Sentin8:Bus with the outbox row id as the idempotency key.
 
 ## 6. Target-User Roles & Use Cases
 
-| Persona | What they do with Ex8:Clearing |
+| Persona | What they do with Exchange8:Clearing |
 |---|---|
 | Clearing operations clerk | Queries the trade and order blotters, verifies execution detail and charges on the books. |
 | Trade support / error desk | Busts a clearly erroneous trade with the required reason and step-up authority, watching the fan-out downstream. |
@@ -183,7 +183,7 @@ relayed to Sentin8:Bus with the outbox row id as the idempotency key.
 
 ## 8. Dependencies & Reliance on Other Services
 
-- **Ex8:ME / Ex8:Gateway / Ex8:SOR / Ex8:OMS** — authoritative order and
+- **Exchange8:ME / Exchange8:Gateway / Exchange8:SOR / Exchange8:OMS** — authoritative order and
   execution event producers; without their events there is no ledger.
 - **Sentin8:Bus** — event transport and consumer groups; outbox relay target.
 - **Sentin8:Auth** — token verification, M2M client registration (DCR),
@@ -196,7 +196,7 @@ relayed to Sentin8:Bus with the outbox row id as the idempotency key.
   role in its own database, no BYPASSRLS anywhere.
 - **Securities-lending feed / prime-broker API (external)** — borrow
   inventory that backs the locate ledger.
-- **Downstream consumers** — Ex8:MD (broken trades), Ex8:Gateway (FIX
+- **Downstream consumers** — Exchange8:MD (broken trades), Exchange8:Gateway (FIX
   re-reports), drop sessions; their correctness depends on Clearing's events
   being emitted exactly once.
 
@@ -249,14 +249,14 @@ relayed to Sentin8:Bus with the outbox row id as the idempotency key.
 - **Real-time CCP novation and collateral.** The business capability of
   novating every trade to a CCP in real time (and tracking collateral) is
   designed but not provided by this service; whether it lands here or in
-  Ex8:Settlement is an open scoping decision.
+  Exchange8:Settlement is an open scoping decision.
 - **Bust scope naming.** The platform-wide registered bust scope is
   `exchange8:trade:bust`; design materials also reference a
   `bust:execute` variant — the business-facing permission name should be
   settled once and reflected everywhere.
 - **Regulatory stream persistence boundary.** The deduplicated reportable
   projection exists here, while regulatory transport belongs to
-  Ex8:Regulatory; the persistence boundary for reportables between the two
+  Exchange8:Regulatory; the persistence boundary for reportables between the two
   is undecided.
 
 ---

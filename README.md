@@ -1,16 +1,16 @@
-# README.md: Ex8:Clearing
+# README.md: Exchange8:Clearing
 
 ## 1. Summary
 
-Ex8:Clearing is the event-sourced order/trade ledger of the exchange8 vertical
+Exchange8:Clearing is the event-sourced order/trade ledger of the exchange8 vertical
 (binary `exchange8-clearing`, service type `exchange8:clearing`). It consumes
 order/trade lifecycle events from the venue flow and projects them into a
 deterministic SQL ledger (`clearing` schema, database `exchange8`), serves the
 trade/order query and trade-bust API, maintains the short-sale locate ledger,
 and fans out per-client drop-copy streams on per-drop sequences with a resend
-store. It does not authorize or match anything — matching lives in Ex8:ME, risk
-limits in Ex8:Risk, settlement in Ex8:Settlement, and regulatory transport in
-Ex8:Regulatory.
+store. It does not authorize or match anything — matching lives in Exchange8:ME, risk
+limits in Exchange8:Risk, settlement in Exchange8:Settlement, and regulatory transport in
+Exchange8:Regulatory.
 
 ## 2. Motivation
 
@@ -46,12 +46,12 @@ M2M client, and its own audit + TLS workloads.
 ```mermaid
 graph TD
     subgraph Producers["Event sources (upstream)"]
-        ME["Ex8:ME<br/>order + execution events"]
-        GW["Ex8:Gateway<br/>order submitted"]
-        SOR["Ex8:SOR<br/>routed fills"]
+        ME["Exchange8:ME<br/>order + execution events"]
+        GW["Exchange8:Gateway<br/>order submitted"]
+        SOR["Exchange8:SOR<br/>routed fills"]
     end
 
-    subgraph ClearingEx8["exchange8-clearing (this unit)"]
+    subgraph ClearingExchange8["exchange8-clearing (this unit)"]
         CONSUMER["Bus consumer task<br/>(projector input)"]
         OP["Order projector<br/>A B P S C X T R M I"]
         TP["Trade projector<br/>two-sided pairing"]
@@ -63,7 +63,7 @@ graph TD
     end
 
     BUS["Sentin8:Bus<br/>POST /v1/produce"]
-    REG["Ex8:Regulatory<br/>reportable stream"]
+    REG["Exchange8:Regulatory<br/>reportable stream"]
 
     ME -->|"bus stream events"| CONSUMER
     GW -->|"bus stream events"| CONSUMER

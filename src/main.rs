@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:CLEARING service binary — event-sourced order/trade ledger + drop copy.
+//! Exchange8:CLEARING service binary — event-sourced order/trade ledger + drop copy.
 //!
 //! Design: `design/sentin8-exchange8-clearing-technical-design.md` (see the
 //! service doc for the exact file). Core logic in the sibling modules;

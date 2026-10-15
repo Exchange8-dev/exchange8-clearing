@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 // SPDX-License-Identifier: Apache-2.0
 
-// Ex8:Clearing event projectors — the deterministic order/trade ledger.
+// Exchange8:Clearing event projectors — the deterministic order/trade ledger.
 //
 // Event-sourced: ME/SOR lifecycle events in → ledger rows out. The projectors
 // are pure functions of the event stream; the DB write layer and drop-copy

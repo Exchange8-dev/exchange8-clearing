@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:Clearing drop-copy + regulatory stream + bust events + purge.
+//! Exchange8:Clearing drop-copy + regulatory stream + bust events + purge.
 //!
 //! - **FIX drop-copy engine**: per-client entitlement-filtered copy of
 //!   order/trade lifecycle; fills-only vs all modes; resend window from the

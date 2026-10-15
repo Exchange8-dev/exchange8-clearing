@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:Clearing securities lending — short-sale locate/borrow ledger.
+//! Exchange8:Clearing securities lending — short-sale locate/borrow ledger.
 //!
 //! Implements clearing-depth design §3: before a short sale, the broker must
 //! locate borrowable shares. This module owns the locate ledger — locate

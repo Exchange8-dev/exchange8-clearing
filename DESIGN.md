@@ -1,10 +1,10 @@
-# DESIGN.md: Ex8:Clearing — Detailed Design Document
+# DESIGN.md: Exchange8:Clearing — Detailed Design Document
 
 ## 1. Scope & Context
 
 ### Owned
 
-Ex8:Clearing owns the deterministic order/trade ledger of the exchange8
+Exchange8:Clearing owns the deterministic order/trade ledger of the exchange8
 vertical: the event-sourced projection of ME/SOR/Gateway order and trade
 lifecycle events, the trade query/bust API, the short-sale locate ledger
 (pure core), the drop-copy fan-out engine (pure core + persisted resend
@@ -16,13 +16,13 @@ durability tables.
 
 ### Not owned (delegated)
 
-- Order authorization, matching, and execution — Ex8:ME (authoritative event
+- Order authorization, matching, and execution — Exchange8:ME (authoritative event
   source).
-- Risk pre-trade checks, shortable flags, margin — Ex8:Risk, Ex8:Margin.
-- Regulatory formatting/transport of reportable events — Ex8:Regulatory
+- Risk pre-trade checks, shortable flags, margin — Exchange8:Risk, Exchange8:Margin.
+- Regulatory formatting/transport of reportable events — Exchange8:Regulatory
   (Clearing emits state-relevant events).
 - CCP novation files, custody, collateral, give-up, block trades, EOD
-  settlement exports — Ex8:Settlement.
+  settlement exports — Exchange8:Settlement.
 - Money movement — the Bank8:Ledger rail.
 - Scheduling of SOD/EOD/purge jobs — Sentin8:Cron (Clearing exposes the pure
   policy; Cron proxy-backs the DELETE).
@@ -36,14 +36,14 @@ durability tables.
 ```mermaid
 graph TD
     subgraph Producers["exchange8 upstream services"]
-        ME["Ex8:ME"]
-        GW["Ex8:Gateway"]
-        SOR["Ex8:SOR"]
-        OMS["Ex8:OMS"]
+        ME["Exchange8:ME"]
+        GW["Exchange8:Gateway"]
+        SOR["Exchange8:SOR"]
+        OMS["Exchange8:OMS"]
     end
 
     subgraph Clearing["exchange8-clearing<br/>(db exchange8, schema clearing)"]
-        SVC["Ex8:Clearing<br/>ledger + bust + drop-copy core"]
+        SVC["Exchange8:Clearing<br/>ledger + bust + drop-copy core"]
     end
 
     subgraph Platform["Sentin8 platform services"]
@@ -54,7 +54,7 @@ graph TD
         DB["Sentin8:DB<br/>PostgreSQL 18, OAuth"]
     end
 
-    DOWN["Ex8:MD / Ex8:Gateway / drop sessions"]
+    DOWN["Exchange8:MD / Exchange8:Gateway / drop sessions"]
 
     ME -->|"bus stream<br/>me:order:*, me:trade:executed"| SVC
     GW -->|"bus stream<br/>gateway:order:submitted"| SVC
@@ -163,7 +163,7 @@ graph TD
 ```mermaid
 sequenceDiagram
     autonumber
-    participant ME as Ex8:ME
+    participant ME as Exchange8:ME
     participant BUS as Sentin8:Bus
     participant CONS as clearing bus consumer
     participant PROJ as TradeProjector
@@ -196,7 +196,7 @@ sequenceDiagram
     autonumber
     participant FEED as Lending desk feed
     participant LED as LocateLedger
-    participant OMS as Ex8:OMS (caller, design)
+    participant OMS as Exchange8:OMS (caller, design)
 
     FEED->>LED: set_inventory(instrument, available, fee_bps) — full replace
     OMS->>LED: request(account, instrument, qty)
@@ -561,11 +561,11 @@ method, 422 invalid bust reason, 409 already busted (declared error code).
 sequenceDiagram
     autonumber
     participant BFF as Sentin8:BFF (user bearer)
-    participant CL as Ex8:Clearing
+    participant CL as Exchange8:Clearing
     participant OB as clearing.outbox
     participant BUS as Sentin8:Bus
-    participant MD as Ex8:MD
-    participant GW as Ex8:Gateway
+    participant MD as Exchange8:MD
+    participant GW as Exchange8:Gateway
     participant DRP as Drop sessions
 
     BFF->>CL: POST /v1/trades/bust {trade_id, reason}
@@ -843,7 +843,7 @@ graph TD
   4.2 session transport, session ops (refresh/seq reset/trace/logout), or
   drop send path is implemented; the pure `DropEngine` is the core only.
 - **Regulatory stream ownership.** The pure `RegulatoryStream` core exists
-  here, per the narrowing that moved regulatory transport to Ex8:Regulatory;
+  here, per the narrowing that moved regulatory transport to Exchange8:Regulatory;
   whether Clearing persists reportables or only emits events for Regulatory
   to persist is not visible from this source tree.
 - **Routing-trades.** The design references `exchange8_routing_trade(+_amend)`
@@ -858,7 +858,7 @@ graph TD
   (`exchange8:clearing:collateral:updated`), give-up/give-in, and
   block-trade/EFP capabilities from the clearing-depth design are absent
   from this source tree and are future designs for this unit or
-  Ex8:Settlement.
+  Exchange8:Settlement.
 - **Bust scope naming.** The clearing design doc names
   `exchange8:trade:bust:execute`; the registered and enforced scope is
   `exchange8:trade:bust`, and the mirror also permits bust holders to read
