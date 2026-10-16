@@ -115,7 +115,6 @@ The binary boots via `sentin8::shell::serve` with service type
 `exchange8:clearing` and env prefix `EXCHANGE8_CLEARING`. The shell owns
 registration output, the DB pool (`connect` capped at 3 unless
 `SENTIN8_PG_POOL_MAX` overrides), `/v1/health`, the Shield admin API mount,
-the mimalloc global allocator, and graceful drain on upgrade. The vertical
 router adds the ledger handlers; registration declares the admin UI pages,
 admin scopes, error code, policy sets, PostgreSQL role, and the M2M workload
 grants.
@@ -720,7 +719,6 @@ sequenceDiagram
 - **Task layout.** One HTTP serve task (axum + shell middleware), one outbox
   relay task (LISTEN-based drain of `clearing.outbox`), one audit pusher
   task, and one bus consumer task feeding the projectors. All workers are
-  in-process tokio tasks, covered by the binary-level mimalloc allocator.
 - **Locking strategy.** No cross-service locks; per-transaction consistency
   only. The projector's pairing state is single-consumer (one consumer group
   task), so the trade-projector maps need no shared mutex. The DB is the

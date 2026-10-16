@@ -2,7 +2,11 @@
   "vertical": "exchange8",
   "services": [
     {
-      "service_type": "exchange8:clearing"
+      "service_type": "exchange8:clearing",
+      "telemetry_property": {
+        "slug": "clearing",
+        "name": "Exchange8:Clearing Telemetry"
+      }
     }
   ]
 }

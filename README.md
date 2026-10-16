@@ -35,7 +35,6 @@ Exchange8:Regulatory.
 The service is a Rust axum binary built on the shared platform shell
 (`sentin8::shell`): registration (`--print-registration`), the
 `EXCHANGE8_CLEARING_DATABASE_URL` pool, the `/v1/health` endpoint, the Shield
-(sentin8-policy) admin API mount, a mimalloc global allocator, and graceful
 drain. Domain logic lives in pure modules (projectors, locate ledger, drop
 engine, regulatory stream, bust ledger, purge policy) that the shell binds to
 persistence and messaging. Externally the service is database-per-vertical /
