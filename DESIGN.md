@@ -179,7 +179,7 @@ sequenceDiagram
     CONS->>PROJ: on_executed(side B)
     PROJ-->>CONS: pair complete (price/qty/liquidity check)
     alt pair valid
-        CONS->>PG: BEGIN; SET tenant ctx (same conn)<br/>INSERT 2 side rows (shared trade_id)
+        CONS->>PG: BEGIN, SET tenant ctx (same conn)<br/>INSERT 2 side rows (shared trade_id)
     else duplicate side / same liquidity / price-qty mismatch
         Note over PROJ: anomalies[trade_id] recorded,<br/>rows still projected for repair
         CONS->>PG: INSERT side rows + anomaly detail
@@ -252,7 +252,7 @@ sequenceDiagram
 
     ADMIN->>RT: POST /v1/trades/bust {trade_id, reason}
     RT->>RT: verify_token (bearer → Sentin8:Auth JWKS)
-    Note over RT: 401 invalid/expired; 403 wrong scope
+    Note over ADMIN,BT: 401 invalid/expired, 403 wrong scope
     RT->>SH: require(EvalTarget exchange8:trade:bust)
     alt enforced Deny
         SH-->>RT: 403 FORBIDDEN
@@ -260,7 +260,7 @@ sequenceDiagram
         alt reason not in erroneous|obvious_error|regulatory
             RT-->>ADMIN: 422 UNPROCESSABLE_ENTITY
         else valid reason
-            RT->>TX: BEGIN; await set_tenant_context(env_id)
+            RT->>TX: BEGIN, await set_tenant_context(env_id)
             RT->>BT: INSERT ... ON CONFLICT (env_id, trade_id) DO NOTHING
             RT->>TR: UPDATE trade SET bust_state='busted' WHERE env_id AND trade_id
             RT->>TX: COMMIT
@@ -281,10 +281,10 @@ sequenceDiagram
     participant PG as clearing tables
 
     UI->>RT: GET /v1/admin/ui/orders (page definition)
-    Note over RT: page definition served when mounted;<br/>data endpoints live today
+    Note over UI,PG: page definition served when mounted,<br/>data endpoints live today
     UI->>RT: GET /v1/admin/orders (data)
     RT->>RT: verify_token + Shield exchange8:order:read
-    RT->>PG: BEGIN tx; set_tenant_context(env); SELECT ... WHERE env_id = $1
+    RT->>PG: BEGIN tx, set_tenant_context(env), SELECT ... WHERE env_id = $1
     PG-->>RT: RLS-filtered rows
     RT-->>UI: JSON (order journal / trade sides)
     Note over RT: /v1/admin/trades, /v1/admin/orders alias<br/>the public handlers (same RLS scope)
@@ -570,7 +570,7 @@ sequenceDiagram
 
     BFF->>CL: POST /v1/trades/bust {trade_id, reason}
     CL->>CL: verify token → Shield exchange8:trade:bust → RLS ctx
-    CL->>CL: INSERT clearing.bust_trade ON CONFLICT DO NOTHING; UPDATE trade.bust_state
+    CL->>CL: INSERT clearing.bust_trade ON CONFLICT DO NOTHING, UPDATE trade.bust_state
     CL->>OB: INSERT bust event (same tx, idempotency_key = row id)
     Note over BUS: relay failure → outbox row stays<br/>unrelayed, retry loop
     CL->>BUS: POST /v1/produce (M2M, exchange8:clearing:trade:busted)
