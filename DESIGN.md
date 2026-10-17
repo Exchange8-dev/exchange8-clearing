@@ -1,4 +1,4 @@
-# DESIGN.md: Exchange8:Clearing — Detailed Design Document
+# Exchange8:Clearing — Detailed Design Document
 
 ## 1. Scope & Context
 

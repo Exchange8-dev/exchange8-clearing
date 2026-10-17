@@ -1,4 +1,4 @@
-# BUSINESS.md: Exchange8:Clearing — Business Requirements & Functionality
+# Exchange8:Clearing — Business Requirements & Functionality
 
 > Audience: product owners, business analysts, and anyone evaluating what
 > Exchange8:Clearing **does for the business**. For architecture read `README.md`;
