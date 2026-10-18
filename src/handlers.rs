@@ -62,6 +62,17 @@ pub struct TradeSideResponse {
     pub bust_state: Option<String>,
     pub trade_ts: chrono::DateTime<chrono::Utc>,
 }
+#[utoipa::path(
+    get,
+    path = "/v1/trades",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "clearing",
+)]
 
 /// `GET /v1/trades` — list executions (RLS-scoped). Both per-side rows of a
 /// trade carry the same `trade_id` (one-row-per-side shape).
@@ -114,6 +125,17 @@ pub struct BustResponse {
     pub trade_id: i64,
     pub busted: bool,
 }
+#[utoipa::path(
+    post,
+    path = "/v1/trades/bust",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "clearing",
+)]
 
 /// `POST /v1/trades/bust` — bust a trade (step-up auth: `exchange8:trade:bust`).
 ///
@@ -192,6 +214,17 @@ pub struct OrderJournalResponse {
     pub cum_qty: rust_decimal::Decimal,
     pub ts: chrono::DateTime<chrono::Utc>,
 }
+#[utoipa::path(
+    get,
+    path = "/v1/orders",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "clearing",
+)]
 
 /// `GET /v1/orders` — the order day log (FIX_ORDER).
 pub async fn list_orders(
