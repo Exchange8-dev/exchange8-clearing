@@ -48,7 +48,7 @@ pub struct ListTradesQuery {
     pub limit: Option<i64>,
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
+#[derive(Debug, Serialize, sqlx::FromRow, utoipa::ToSchema)]
 pub struct TradeSideResponse {
     pub id: Uuid,
     pub env_id: Uuid,
@@ -66,7 +66,7 @@ pub struct TradeSideResponse {
     get,
     path = "/v1/trades",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Clearing trades", body = Vec<TradeSideResponse>),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -113,14 +113,14 @@ pub async fn list_trades(
     Ok(Json(rows))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, utoipa::ToSchema)]
 pub struct BustTradeRequest {
     pub trade_id: i64,
     /// One of: erroneous | obvious_error | regulatory.
     pub reason: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, utoipa::ToSchema)]
 pub struct BustResponse {
     pub trade_id: i64,
     pub busted: bool,
@@ -129,7 +129,7 @@ pub struct BustResponse {
     post,
     path = "/v1/trades/bust",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Trade busted", body = BustResponse),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -198,7 +198,7 @@ pub async fn bust_trade(
     }))
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
+#[derive(Debug, Serialize, sqlx::FromRow, utoipa::ToSchema)]
 pub struct OrderJournalResponse {
     pub id: Uuid,
     pub env_id: Uuid,
@@ -218,7 +218,7 @@ pub struct OrderJournalResponse {
     get,
     path = "/v1/orders",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Order journal", body = Vec<OrderJournalResponse>),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
