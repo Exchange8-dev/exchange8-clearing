@@ -3,7 +3,7 @@
 -- SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 -- SPDX-License-Identifier: Apache-2.0
 
--- Ex8:Clearing — event-sourced trading ledger + drop copy.
+-- Ex8:Clearing - event-sourced trading ledger + drop copy.
 --
 -- Design: design/sentin8-exchange8-data-model-technical-design.md §3.2 (CL) + §3.4.
 -- No migration code (new platform): `sentin8-cli vertical init` applies this.
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS clearing.fix_order (
 CREATE INDEX IF NOT EXISTS idx_exchange8_fixorder_env_conn_ts ON clearing.fix_order (env_id, connection_id, ts);
 CREATE INDEX IF NOT EXISTS idx_exchange8_fixorder_env_symbol ON clearing.fix_order (env_id, symbol);
 
--- Lifecycle journal (legacy ORDER_UPDATE) — append-only.
+-- Lifecycle journal (legacy ORDER_UPDATE) - append-only.
 CREATE TABLE IF NOT EXISTS clearing.order_update (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     env_id      UUID NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS clearing.order_cross (
     sell_qty    NUMERIC(18,8)
 );
 
--- Executions (legacy TRADE) — one row per side, shared trade_id.
+-- Executions (legacy TRADE) - one row per side, shared trade_id.
 CREATE TABLE IF NOT EXISTS clearing.trade (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     env_id          UUID NOT NULL,
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS clearing.drop_entitlement_connection (
     PRIMARY KEY (drop_connection_id, connection_id)
 );
 
--- Drop resend store (legacy FIXDROP_MESSAGE) — retention-purged.
+-- Drop resend store (legacy FIXDROP_MESSAGE) - retention-purged.
 CREATE TABLE IF NOT EXISTS clearing.drop_message (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     env_id      UUID NOT NULL,
@@ -209,7 +209,7 @@ END $$;
 
 -- ---------------------------------------------------------------------------
 -- Per-service role grants (schema-per-service: this service owns schema
--- `clearing`; grants live in db `exchange8` only — design doc §1).
+-- `clearing`; grants live in db `exchange8` only - design doc §1).
 -- ---------------------------------------------------------------------------
 DO $$
 BEGIN
@@ -222,7 +222,7 @@ BEGIN
 END $$;
 
 -- ---------------------------------------------------------------------------
--- Local outbox (DBX §6.7 — generated from `sentin8_outbox::outbox_table_sql(
+-- Local outbox (DBX §6.7 - generated from `sentin8_outbox::outbox_table_sql(
 -- "clearing")`): rows written in the same DB transaction as the domain change;
 -- the shell's relay (boot step §8b) pushes them to Bus `POST /v1/produce`.
 -- ---------------------------------------------------------------------------
@@ -276,7 +276,7 @@ CREATE TRIGGER outbox_notify_trigger
     EXECUTE FUNCTION clearing.clearing_notify_outbox();
 
 -- ---------------------------------------------------------------------------
--- Local audit journal (DBX §6.8 — generated from
+-- Local audit journal (DBX §6.8 - generated from
 -- `sentin8_audit::audit_journal_sql("clearing")`): rows written in the same
 -- transaction as the domain change; the shell's pusher (boot step §8c) pushes
 -- them to Sys `POST /v1/audit` (`sentin8:sys:audit:write`). A Sys outage

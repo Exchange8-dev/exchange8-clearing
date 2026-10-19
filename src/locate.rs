@@ -3,11 +3,11 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:Clearing securities lending — short-sale locate/borrow ledger.
+//! Exchange8:Clearing securities lending - short-sale locate/borrow ledger.
 //!
 //! Implements clearing-depth design §3: before a short sale, the broker must
-//! locate borrowable shares. This module owns the locate ledger — locate
-//! requests, approvals, consumption at execution, and expiry — plus the
+//! locate borrowable shares. This module owns the locate ledger - locate
+//! requests, approvals, consumption at execution, and expiry - plus the
 //! borrow inventory that backs it (securities-lending feed / prime-broker
 //! API projection).
 //!
@@ -146,7 +146,7 @@ impl LocateLedger {
                 continue;
             };
             if l.expires_us <= self.now_us {
-                continue; // expired — unusable
+                continue; // expired - unusable
             }
             let avail = l.qty - l.consumed;
             if avail == 0 {

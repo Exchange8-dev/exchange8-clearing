@@ -8,7 +8,7 @@ order/trade lifecycle events from the venue flow and projects them into a
 deterministic SQL ledger (`clearing` schema, database `exchange8`), serves the
 trade/order query and trade-bust API, maintains the short-sale locate ledger,
 and fans out per-client drop-copy streams on per-drop sequences with a resend
-store. It does not authorize or match anything — matching lives in Exchange8:ME, risk
+store. It does not authorize or match anything - matching lives in Exchange8:ME, risk
 limits in Exchange8:Risk, settlement in Exchange8:Settlement, and regulatory transport in
 Exchange8:Regulatory.
 
@@ -112,8 +112,8 @@ handlers, and the platform Shield admin API is mounted by the shell.
 - **SQL projection with a Bus outbox, not a ledger-only database.** Rows are
   written in the same transaction as a `clearing.outbox` INSERT, so the ledger
   and its published events commit atomically; a relay pushes the outbox to
-  Sentin8:Bus. An alternative — publishing before commit, or a separate
-  change-data-capture process — risks ledger/event divergence or adds
+  Sentin8:Bus. An alternative - publishing before commit, or a separate
+  change-data-capture process - risks ledger/event divergence or adds
   infrastructure the platform already provides.
 - **Pure-core projectors with a thin shell.** All projection, pairing, locate,
   fan-out, and bust logic is deterministic, dependency-free Rust
@@ -136,7 +136,7 @@ handlers, and the platform Shield admin API is mounted by the shell.
 
 - **Same-connection tenant context.** Every handler acquires a connection,
   opens a transaction, awaits `set_tenant_context` on that same transaction,
-  and then queries it — the RLS context is transaction-local
+  and then queries it - the RLS context is transaction-local
   (`set_config(..., true)`). Invariant: context-set and data query ride the
   same transaction, and the async context helper is always `.await`ed.
 - **Three-way scope parity.** The handler scope constants, the handler
@@ -146,7 +146,7 @@ handlers, and the platform Shield admin API is mounted by the shell.
   is `mode='enforced'` and enrolled as `origin='platform'`.
 - **Idempotency keys.** Trade busts dedupe on `(env_id, trade_id)`;
   drop messages dedupe on `(connection_id, seq_no)`; outbox produce uses the
-  row id as the Bus idempotency key — at-least-once relay plus idempotent
+  row id as the Bus idempotency key - at-least-once relay plus idempotent
   sinks yields effectively-once.
 - **RLS backstop.** Every `clearing` table (including outbox and audit
   journal) is `ENABLE`+`FORCE`d with `env_id = sentin8_current_env_id()`
@@ -154,7 +154,7 @@ handlers, and the platform Shield admin API is mounted by the shell.
   defense-in-depth. The service role has no BYPASSRLS.
 - **Purge stays local.** Retention deletion targets only `clearing.drop_message`
   (2555-day regulatory keep); deleting other services' message stores from
-  here is prohibited — purge is owning-service scoped.
+  here is prohibited - purge is owning-service scoped.
 
 ## 7. Unresolved Questions / Future Designs
 
@@ -162,7 +162,7 @@ handlers, and the platform Shield admin API is mounted by the shell.
   regulatory stream, locate ledger, and purge policy are implemented and
   unit-tested as pure modules, but the Bus consumer task, drop FIX sessions,
   lending-feed adapter, and Cron purge proxy-back wiring are not yet driven
-  from `main.rs` — the runtime currently serves the HTTP ledger API only.
+  from `main.rs` - the runtime currently serves the HTTP ledger API only.
 - **RFW UI endpoints.** Registration declares the `drops`, `trades`, and
   `orders` admin pages (`/v1/admin/ui/...`), but no UI-definition handlers
   are mounted in the router yet; only the data endpoints are live.
@@ -174,7 +174,7 @@ handlers, and the platform Shield admin API is mounted by the shell.
   the clearing-depth design are not in this service yet.
 - **Bust reason scope name.** The design doc names the bust scope
   `exchange8:trade:bust:execute`; the registered and enforced scope is
-  `exchange8:trade:bust` — the registry is the authority today.
+  `exchange8:trade:bust` - the registry is the authority today.
 
 ---
 

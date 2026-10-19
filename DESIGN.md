@@ -1,4 +1,4 @@
-# Exchange8:Clearing — Detailed Design Document
+# Exchange8:Clearing - Detailed Design Document
 
 ## 1. Scope & Context
 
@@ -16,20 +16,20 @@ durability tables.
 
 ### Not owned (delegated)
 
-- Order authorization, matching, and execution — Exchange8:ME (authoritative event
+- Order authorization, matching, and execution - Exchange8:ME (authoritative event
   source).
-- Risk pre-trade checks, shortable flags, margin — Exchange8:Risk, Exchange8:Margin.
-- Regulatory formatting/transport of reportable events — Exchange8:Regulatory
+- Risk pre-trade checks, shortable flags, margin - Exchange8:Risk, Exchange8:Margin.
+- Regulatory formatting/transport of reportable events - Exchange8:Regulatory
   (Clearing emits state-relevant events).
 - CCP novation files, custody, collateral, give-up, block trades, EOD
-  settlement exports — Exchange8:Settlement.
-- Money movement — the Bank8:Ledger rail.
-- Scheduling of SOD/EOD/purge jobs — Sentin8:Cron (Clearing exposes the pure
+  settlement exports - Exchange8:Settlement.
+- Money movement - the Bank8:Ledger rail.
+- Scheduling of SOD/EOD/purge jobs - Sentin8:Cron (Clearing exposes the pure
   policy; Cron proxy-backs the DELETE).
-- Identity, tokens, JWKS — Sentin8:Auth (the only issuer).
-- Policy decisions — the Shield engine (`sentin8-policy`) embedded via the
+- Identity, tokens, JWKS - Sentin8:Auth (the only issuer).
+- Policy decisions - the Shield engine (`sentin8-policy`) embedded via the
   shell; the `scope` JWT claim is the pre-filter, never the decision.
-- Object/file storage (SOD/EOD artifacts) — Sentin8:Storage.
+- Object/file storage (SOD/EOD artifacts) - Sentin8:Storage.
 
 ### System context
 
@@ -172,7 +172,7 @@ sequenceDiagram
     ME->>BUS: stream event me:trade:executed (side A, Removed)
     BUS->>CONS: consume (consumer group exchange8-clearing)
     CONS->>PROJ: on_executed(side A)
-    Note over PROJ: pending buffer — counterpart awaited
+    Note over PROJ: pending buffer - counterpart awaited
     ME->>BUS: stream event me:trade:executed (side B, Added)
     BUS->>CONS: consume
     CONS->>PROJ: on_executed(side B)
@@ -197,21 +197,21 @@ sequenceDiagram
     participant LED as LocateLedger
     participant OMS as Exchange8:OMS (caller, design)
 
-    FEED->>LED: set_inventory(instrument, available, fee_bps) — full replace
+    FEED->>LED: set_inventory(instrument, available, fee_bps) - full replace
     OMS->>LED: request(account, instrument, qty)
     alt qty = 0 / no inventory / reserved > free availability
         LED-->>OMS: Rejected(zero_qty | no_inventory | insufficient_inventory)
     else fits unreserved availability
-        LED-->>OMS: Approved(locate_id, qty) — 24h validity
+        LED-->>OMS: Approved(locate_id, qty) - 24h validity
         Note over LED: reservation added<br/>(qty - consumed counts against inventory)
     end
     OMS->>LED: consume(account, instrument, qty) at short-sale execution
     alt chain covers qty (oldest-first, unexpired)
-        LED-->>OMS: true — locate consumed, reservation released
+        LED-->>OMS: true - locate consumed, reservation released
     else uncovered or expired
-        LED-->>OMS: false — short sale must be rejected upstream
+        LED-->>OMS: false - short sale must be rejected upstream
     end
-    LED->>LED: expire_stale() sweep — drop expired, release reservations
+    LED->>LED: expire_stale() sweep - drop expired, release reservations
 ```
 
 ### Request family: drop-copy emission (pure engine; session transport in Open Questions)
@@ -224,7 +224,7 @@ sequenceDiagram
     participant ENT as DropEntitlement set
     participant BUF as clearing.drop_message (persisted buffer)
 
-    PROJ->>ENG: ingest(event, entitled) — seq += 1
+    PROJ->>ENG: ingest(event, entitled) - seq += 1
     loop per entitled client
         alt fills_only AND order-class event
             Note over ENG: skipped
@@ -476,12 +476,12 @@ erDiagram
 | `clearing.order_replace` | Replace mapping: orig ↔ new cl_ord_id with price/volume. | RLS env-scoped. |
 | `clearing.order_cross` | Cross-extension record. | RLS env-scoped. |
 | `clearing.trade` | Executions, one row per side, shared trade_id; liquidity A (Added/maker) / R (Removed/taker); charge on the row. | RLS env-scoped; UNIQUE implicit (env, trade_id, side) via indexes; bust_state in (active, busted). |
-| `clearing.bust_trade` | Bust records; UNIQUE (env_id, trade_id) — the idempotency key. | RLS env-scoped; reason CHECK (erroneous, obvious_error, regulatory). |
+| `clearing.bust_trade` | Bust records; UNIQUE (env_id, trade_id) - the idempotency key. | RLS env-scoped; reason CHECK (erroneous, obvious_error, regulatory). |
 | `clearing.amend_trade` | Amend records (qty/price/wash/principal). | RLS env-scoped; referenced by trade.amend_id (UUID). |
 | `clearing.trade_charge_static` / `_dynamic` / `trade_category` | Charge tables preserved for commission-at-trade-time. | RLS env-scoped; category code UNIQUE. |
 | `clearing.drop_connection` | Drop session config: comp_id (UNIQUE), mode ALL/FILLS, status E/D/H, book_tokens text[]. | RLS env-scoped. |
 | `clearing.drop_entitlement_customer` / `_trader` / `_connection` | Entitlement junctions (customer, trader, originating-connection parity). | RLS env-scoped; FK to drop_connection; PK (drop_connection_id, entity). |
-| `clearing.drop_message` | Drop resend store (seq per connection, msg_type + body). | RLS env-scoped; UNIQUE (connection_id, seq_no) — the resend dedupe/idempotency key; retention-purged at 2555 days. |
+| `clearing.drop_message` | Drop resend store (seq per connection, msg_type + body). | RLS env-scoped; UNIQUE (connection_id, seq_no) - the resend dedupe/idempotency key; retention-purged at 2555 days. |
 | `clearing.outbox` | Local outbox (DBX): rows committed in the same transaction as domain writes; relay pushes to Bus `POST /v1/produce` with idempotency_key = row id; `pg_notify('clearing_outbox_changed')`. | RLS env-scoped; partial index on unrelayed rows. |
 | `clearing.audit_journal` | Local audit journal (DBX); the shell pusher pushes to Sys `POST /v1/audit` (`sentin8:sys:audit:write`). | RLS env-scoped; partial index on unpushed rows. |
 
@@ -493,7 +493,7 @@ Locate lifecycle (pure core):
 stateDiagram-v2
     [*] --> Requested: request(account, instrument, qty)
     Requested --> Rejected: zero_qty | no_inventory | insufficient_inventory
-    Requested --> Active: Approved(locate_id, qty) — 24h validity
+    Requested --> Active: Approved(locate_id, qty) - 24h validity
     Active --> Consumed_partial: consume(qty') at short sale (oldest-first chain)
     Consumed_partial --> Consumed_partial: further consumes
     Active --> Consumed_full: consume(qty = qty)
@@ -535,23 +535,23 @@ method, 422 invalid bust reason, 409 already busted (declared error code).
 
 ### Internal (consumed / produced)
 
-- **Bus consume (consumer group `exchange8-clearing`)** — M2M scopes
+- **Bus consume (consumer group `exchange8-clearing`)** - M2M scopes
   `sentin8:bus:produce`, `sentin8:bus:consume`; stream families carry
   `exchange8:me:order:{booked,killed,modified,executed,rejected,repriced}`,
   `exchange8:me:trade:executed`, `exchange8:gateway:order:submitted`,
   `exchange8:sor:leg:{filled,...}`.
-- **Bus produce (outbox relay)** — `POST /v1/produce`, idempotency_key =
+- **Bus produce (outbox relay)** - `POST /v1/produce`, idempotency_key =
   `clearing.outbox.id`; event names follow
   `exchange8:{service}:{resource}:{operation}` (e.g. bust →
   `exchange8:clearing:trade:busted`; drops → `exchange8:clearing:drop:sent`).
-- **Sys audit push** — `POST /v1/audit` (`sentin8:sys:audit:write`, workload
+- **Sys audit push** - `POST /v1/audit` (`sentin8:sys:audit:write`, workload
   `clearing-audit`).
-- **Sys hostname resolve (TLS)** — workload `exchange8-clearing-tls`,
+- **Sys hostname resolve (TLS)** - workload `exchange8-clearing-tls`,
   `GET /v1/resolve/hostname` (`sentin8:sys:instances:read`); this service's
   TLS path is database-free.
-- **Cron proxy-back** — purge of `clearing.drop_message` (2555-day
+- **Cron proxy-back** - purge of `clearing.drop_message` (2555-day
   retention); the pure `purge_cutoffs` policy is what Cron executes against.
-- **Shield policy admin** — mounted by the shell (`mount_policy_admin`);
+- **Shield policy admin** - mounted by the shell (`mount_policy_admin`);
   admin scopes `exchange8:clearing:policy:read` / `exchange8:clearing:policy:write`.
 
 ### Multi-party: bust → bus fan-out (me → clearing → bus)
@@ -625,13 +625,13 @@ enforcement in the SQL matrix tests.
 |---|---|---|
 | Trade bust | `(env_id, trade_id)` on `clearing.bust_trade` | `ON CONFLICT DO NOTHING`; replay marks the trade rows anyway; declared 409 `exchange8_trade_already_busted` |
 | Trade pairing | `trade_id` pair state | Duplicate/same-liquidity sides recorded as anomalies, not duplicates |
-| Drop resend | `(connection_id, seq_no)` on `clearing.drop_message` | UNIQUE — replayed send is rejected |
+| Drop resend | `(connection_id, seq_no)` on `clearing.drop_message` | UNIQUE - replayed send is rejected |
 | Regulatory stream | `(kind, id)` set | at-least-once in → exactly-once out |
 | Outbox produce | `clearing.outbox.id` | Bus dedupe on idempotency_key |
 
 ### Rate limiting / bot protection
 
-Inherited from the platform tier (Sentin8:Proxy / BFF) — the service exposes
+Inherited from the platform tier (Sentin8:Proxy / BFF) - the service exposes
 no public ingress of its own and performs no per-request throttling beyond
 query `LIMIT` caps (`trades` ≤ 1000 rows, `orders` ≤ 500 rows per page).
 
@@ -639,7 +639,7 @@ query `LIMIT` caps (`trades` ≤ 1000 rows, `orders` ≤ 500 rows per page).
 
 Domain mutations (bust) write `clearing.audit_journal` rows in the same
 transaction where available; the shell pusher (workload `clearing-audit`,
-`sentin8:sys:audit:write`) forwards to Sys `POST /v1/audit` with retry —
+`sentin8:sys:audit:write`) forwards to Sys `POST /v1/audit` with retry -
 a Sys outage never drops audit (unpushed partial-index drain loop).
 
 ### Graceful drain (upgrade-instance)
@@ -653,7 +653,7 @@ restart, so a drain mid-relay loses nothing.
 
 Post-quantum-exclusive TLS via the `sentin8-tls` library: X25519MLKEM768 key
 exchange, ML-DSA-65 signatures, SLH-DSA root in the OS trust store. The
-`exchange8-clearing-tls` M2M workload is database-free — hostname resolution
+`exchange8-clearing-tls` M2M workload is database-free - hostname resolution
 runs through Sys `GET /v1/resolve/hostname` (scope
 `sentin8:sys:instances:read`) with a TTL cache; no platform-DB DSN is held.
 
@@ -724,9 +724,9 @@ sequenceDiagram
   task), so the trade-projector maps need no shared mutex. The DB is the
   shared state; idempotency UNIQUE constraints are the race authorities.
 - **Pool sizing.** `sentin8_config::pg_pool::connect` caps at 3 connections
-  (`SENTIN8_PG_POOL_MAX` override) — protect the ~20-service cluster from
+  (`SENTIN8_PG_POOL_MAX` override) - protect the ~20-service cluster from
   pool exhaustion; handlers use one short transaction each.
-- **Hot path.** Trade projection (2 side rows per trade) — batching and the
+- **Hot path.** Trade projection (2 side rows per trade) - batching and the
   outbox partial indexes make relay drain cheap; queries are index-backed on
   `(env_id, trade_ts)`, `(env_id, trade_id)`, `(env_id, order_id)`,
   `(env_id, connection_id, ts)`.
@@ -764,7 +764,7 @@ graph LR
    expired locate is unusable until swept.
 5. Bust is idempotent per `(env_id, trade_id)`; the trade rows are marked
    `busted` regardless of whether the bust row already existed.
-6. Ledger and outbox write atomically — no committed domain row without its
+6. Ledger and outbox write atomically - no committed domain row without its
    outbox row (when emitted by that write path), and vice versa.
 7. RLS is FORCEd on every `clearing` table including outbox and audit
    journal; the service role has no BYPASSRLS; context and query share the
@@ -772,7 +772,7 @@ graph LR
 8. Drop resend sequence is per `(connection_id, seq_no)` and strictly
    increasing; buffer order is preserved.
 9. Purge deletes only `clearing.drop_message` rows older than the retention
-   cutoff (2555 days) — never another service's tables.
+   cutoff (2555 days) - never another service's tables.
 
 **Insecure defaults rejected:** plaintext provider/credentials rows (all
 session credentials are Sentin8-issued, revocable); cross-schema DELETE for
@@ -790,7 +790,7 @@ crate is pure Rust over the platform shell.
 
 ```mermaid
 graph TD
-    E2E["E2E (workspace) — flows through UI/BFF only"] --> INT["Integration (sql_matrix.rs)<br/>live DB, exchange8_probe NOBYPASSRLS role"]
+    E2E["E2E (workspace) - flows through UI/BFF only"] --> INT["Integration (sql_matrix.rs)<br/>live DB, exchange8_probe NOBYPASSRLS role"]
     INT --> COMP["Component (policy.rs)<br/>Shield engine with REAL registration seed"]
     COMP --> UNIT["Unit + oneshot (projector/locate/drop_copy modules,<br/>handlers.rs scope matrix,<br/>handlers_oneshot.rs real router)"]
 ```
@@ -803,10 +803,10 @@ graph TD
   authorization/idempotence; purge cutoff arithmetic + saturation; locate
   approve/consume/expire/reservation math.
 - **Oneshot HTTP** (`tests/handlers_oneshot.rs`): the real router with a
-  never-connected pool — 401 before any DB touch, 405/404 route shape, plain
+  never-connected pool - 401 before any DB touch, 405/404 route shape, plain
   text auth error envelope.
 - **Component policy** (`tests/policy.rs`): the Shield engine on the REAL
-  `SCOPE_MIRROR_POLICIES` seed — fail-closed no-set deny, enforced no-match
+  `SCOPE_MIRROR_POLICIES` seed - fail-closed no-set deny, enforced no-match
   deny, shadow never blocks, forbid-over-permit, M2M parity, platform-admin
   scopes pass, role-keyed tenant sets, cross-env isolation, mirror covers
   every handler action, enroll dry-run.
@@ -817,7 +817,7 @@ graph TD
   offline.
 - **Deliberately not tested here:** FIX wire encoding crate-bytes (owned by
   the wire/FIX crates), platform TLS/DR patterns, gateway/me behavior, and
-  the drop FIX session transport (session transport is not yet wired — see
+  the drop FIX session transport (session transport is not yet wired - see
   Open Questions).
 
 ## 10. Open Questions
@@ -845,7 +845,7 @@ graph TD
   whether Clearing persists reportables or only emits events for Regulatory
   to persist is not visible from this source tree.
 - **Routing-trades.** The design references `exchange8_routing_trade(+_amend)`
-  for SOR-routed fills; no `routing_trade` table exists in init.sql — either
+  for SOR-routed fills; no `routing_trade` table exists in init.sql - either
   the ledger is SOR-agnostic today or the table lives elsewhere; the sources
   do not show a `routing_trade` projection input.
 - **Locate persistence + feed adapter.** No locate table in this schema; the

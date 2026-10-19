@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:Clearing data handlers — the trade ledger query API.
+//! Exchange8:Clearing data handlers - the trade ledger query API.
 //!
 //! Every handler follows the platform authorization pipeline (§5): verify
 //! bearer → scope check → RLS context (same connection) → explicit
@@ -24,14 +24,14 @@ use uuid::Uuid;
 
 use sentin8::shell::{err_db, AppState};
 
-/// Scope constants for every handler in this module — single source of truth
+/// Scope constants for every handler in this module - single source of truth
 /// for both the call sites and the authorization matrix tests
 /// (see DESIGN.md §9). Changing a scope here changes the live gate AND the
 /// test expectation together.
 pub mod scopes {
     /// `GET /v1/trades` (list_trades).
     pub const TRADES_READ: &str = "exchange8:trade:read";
-    /// `POST /v1/trades/bust` (bust_trade) — step-up authorization.
+    /// `POST /v1/trades/bust` (bust_trade) - step-up authorization.
     pub const TRADES_BUST: &str = "exchange8:trade:bust";
     /// `GET /v1/orders` (list_orders).
     pub const ORDERS_READ: &str = "exchange8:order:read";
@@ -74,7 +74,7 @@ pub struct TradeSideResponse {
     tag = "clearing",
 )]
 
-/// `GET /v1/trades` — list executions (RLS-scoped). Both per-side rows of a
+/// `GET /v1/trades` - list executions (RLS-scoped). Both per-side rows of a
 /// trade carry the same `trade_id` (one-row-per-side shape).
 pub async fn list_trades(
     State(state): State<Arc<AppState>>,
@@ -137,7 +137,7 @@ pub struct BustResponse {
     tag = "clearing",
 )]
 
-/// `POST /v1/trades/bust` — bust a trade (step-up auth: `exchange8:trade:bust`).
+/// `POST /v1/trades/bust` - bust a trade (step-up auth: `exchange8:trade:bust`).
 ///
 /// Idempotent per trade_id (`exchange8_bust_trade` unique on env+trade).
 pub async fn bust_trade(
@@ -165,7 +165,7 @@ pub async fn bust_trade(
     let mut conn = state.pool.acquire().await.map_err(err_db)?;
     let mut ctx = conn.begin().await.map_err(err_db)?;
     sentin8::shell::set_tenant_context(&mut ctx, a.env_id()).await;
-    // ON CONFLICT (env_id, trade_id) DO NOTHING — idempotent bust. The
+    // ON CONFLICT (env_id, trade_id) DO NOTHING - idempotent bust. The
     // row id isn't needed; the UPDATE below marks the trade rows either way.
     let _ = sqlx::query_scalar::<_, i64>(
         r#"INSERT INTO clearing.bust_trade (env_id, trade_id, reason, busted_by)
@@ -226,7 +226,7 @@ pub struct OrderJournalResponse {
     tag = "clearing",
 )]
 
-/// `GET /v1/orders` — the order day log (FIX_ORDER).
+/// `GET /v1/orders` - the order day log (FIX_ORDER).
 pub async fn list_orders(
     State(state): State<Arc<AppState>>,
     headers: axum::http::HeaderMap,
@@ -277,7 +277,7 @@ mod scope_matrix {
     use super::scopes;
     use sentin8::shell::{AuthContext, VerifiedClaims};
 
-    /// (handler, required scopes) wiring — call sites must consume exactly
+    /// (handler, required scopes) wiring - call sites must consume exactly
     /// these constants (compile-enforced via `scopes::`).
     const HANDLER_SCOPES: &[(&str, &[&str])] = &[
         ("list_trades", &[scopes::TRADES_READ]),
@@ -285,7 +285,7 @@ mod scope_matrix {
         ("list_orders", &[scopes::ORDERS_READ]),
     ];
 
-    /// Every exchange8 scope this module declares — drives the sibling
+    /// Every exchange8 scope this module declares - drives the sibling
     /// denial row (one service's scope must not open another's guard).
     const SIBLING_SCOPES: &[&str] = &[
         scopes::TRADES_READ,
@@ -294,7 +294,7 @@ mod scope_matrix {
     ];
 
     /// Build an `AuthContext` with exactly the given space-separated scope
-    /// set — the same construction the handlers see after real verification.
+    /// set - the same construction the handlers see after real verification.
     fn ctx(scope: &str) -> AuthContext {
         AuthContext {
             claims: VerifiedClaims {
@@ -313,7 +313,7 @@ mod scope_matrix {
                 service_type: None,
             },
             // Bearer-path context: no certificate workload on the test
-            // identity (CERTFREE-4V — the field exists for the cert path).
+            // identity (CERTFREE-4V - the field exists for the cert path).
             workload: None,
         }
     }
@@ -380,7 +380,7 @@ mod scope_matrix {
         assert!(ctx("exchange8:trade:read:all")
             .require_any_scope(&[scopes::TRADES_READ])
             .is_ok());
-        // But an unrelated scope sharing a text prefix is NOT accepted —
+        // But an unrelated scope sharing a text prefix is NOT accepted -
         // segment-exact, never substring.
         assert!(ctx("exchange8:trade:readx")
             .require_any_scope(&[scopes::TRADES_READ])
@@ -392,7 +392,7 @@ mod scope_matrix {
         // AGENTS.md prescribes 4 segments, but the registered reality in
         // `sentin8.vertical_admin_scopes` is 3 for pre-FX scopes
         // (`exchange8:trade:read`) and 4 for FX-era ones
-        // (`exchange8:rfq:rfq:write`). Pin the REGISTERED contract: 3–4
+        // (`exchange8:rfq:rfq:write`). Pin the REGISTERED contract: 3-4
         // segments, exchange8 vertical, lowercase, no empty segments.
         // Renaming scopes to 4 segments is a platform-wide migration
         // (role mappings in DB), not a code-local change.
@@ -416,7 +416,7 @@ mod scope_matrix {
         }
         // Every declared constant must be wired into HANDLER_SCOPES (a
         // declared-but-unwired scope would silently rot). Shared constants
-        // across handlers are legitimate — dedup first.
+        // across handlers are legitimate - dedup first.
         all.sort_unstable();
         all.dedup();
         let mut declared = vec![

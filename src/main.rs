@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:CLEARING service binary — event-sourced order/trade ledger + drop copy.
+//! Exchange8:CLEARING service binary - event-sourced order/trade ledger + drop copy.
 //!
 //! Design: `design/sentin8-exchange8-clearing-technical-design.md` (see the
 //! service doc for the exact file). Core logic in the sibling modules;
@@ -25,11 +25,11 @@ fn extend_router(
     app: axum::Router<std::sync::Arc<sentin8::shell::AppState>>,
     _state: std::sync::Arc<sentin8::shell::AppState>,
 ) -> axum::Router<std::sync::Arc<sentin8::shell::AppState>> {
-    // ── Sentin8:Policy admin API (policy design §3.6 — shared implementation;
+    // ── Sentin8:Policy admin API (policy design §3.6 - shared implementation;
     // the shell AppState already implements HasPolicyAdmin).
     sentin8::shell::mount_policy_admin(
         // Projectors run on the Bus consumer task (design §4.1). The HTTP
-        // router exposes the ledger query API (trades/orders/bust — RLS-scoped)
+        // router exposes the ledger query API (trades/orders/bust - RLS-scoped)
         // + health; admin/RFW data endpoints alias the same handlers.
         app.route("/v1/trades", axum::routing::get(handlers::list_trades))
             .route("/v1/trades/bust", axum::routing::post(handlers::bust_trade))

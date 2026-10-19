@@ -7,7 +7,7 @@
 //!
 //! Drives the REAL router through `tower::ServiceExt::oneshot`: route
 //! mounting, the authorization pipeline (bearer → scope), status codes,
-//! and the JSON error envelope — without a database. DB-free guarantee:
+//! and the JSON error envelope - without a database. DB-free guarantee:
 //! every data-path handler calls `require_any_scope` BEFORE the first
 //! pool access, so a bearer-less request never reaches `state.pool`.
 //!
@@ -15,7 +15,7 @@
 //! and the scope matrices inside `handlers.rs`.
 //!
 //! The clearing crate is bin-only, so the handlers module is pulled in
-//! via `#[path]` — the same pattern across exchange8 service tests.
+//! via `#[path]` - the same pattern across exchange8 service tests.
 
 #[path = "../src/handlers.rs"]
 #[allow(dead_code)] // bin-module fields unused by the DB-free oneshot paths
@@ -85,7 +85,7 @@ fn req(method: &str, uri: &str) -> Request<Body> {
         .unwrap()
 }
 
-/// 1 — every route rejects a bearer-less request with 401. Proves the
+/// 1 - every route rejects a bearer-less request with 401. Proves the
 /// route is mounted AND the authorization pipeline fires before any DB
 /// work (a pool hit here would hang/error differently).
 #[tokio::test]
@@ -109,7 +109,7 @@ async fn every_route_rejects_unauthenticated_with_401() {
     }
 }
 
-/// 2 — wrong-method on an existing path → 405 (route table shape check).
+/// 2 - wrong-method on an existing path → 405 (route table shape check).
 #[tokio::test]
 async fn wrong_method_gets_405_not_404() {
     let app = router();
@@ -117,7 +117,7 @@ async fn wrong_method_gets_405_not_404() {
     assert_eq!(res.status(), StatusCode::METHOD_NOT_ALLOWED);
 }
 
-/// 3 — unmatched path → 404 (route table completeness: no catch-all that
+/// 3 - unmatched path → 404 (route table completeness: no catch-all that
 /// would leak 401s for unknown paths).
 #[tokio::test]
 async fn unknown_path_gets_404() {
@@ -126,7 +126,7 @@ async fn unknown_path_gets_404() {
     assert_eq!(res.status(), StatusCode::NOT_FOUND);
 }
 
-/// 4 — the error envelope is the platform `(StatusCode, String)` mapping:
+/// 4 - the error envelope is the platform `(StatusCode, String)` mapping:
 /// body is plain text carrying the auth message (never SQL internals).
 #[tokio::test]
 async fn unauthenticated_error_envelope_is_plain_text_401() {

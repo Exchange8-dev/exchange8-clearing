@@ -1,4 +1,4 @@
-# Exchange8:Clearing — Business Requirements & Functionality
+# Exchange8:Clearing - Business Requirements & Functionality
 
 > Audience: product owners, business analysts, and anyone evaluating what
 > Exchange8:Clearing **does for the business**. For architecture read `README.md`;
@@ -13,7 +13,7 @@ clearing firms watch their firms' activity in real time through drop copies;
 it lets operations correct errors on the record through controlled, audited
 trade busts; and it enforces the short-sale locate discipline the regulator
 requires before any short sale executes. The ledger it produces is also the
-raw material every other capability downstream consumes — market data trade
+raw material every other capability downstream consumes - market data trade
 series, regulatory reports, settlement netting, and surveillance analytics.
 
 ## 2. Business Scope (What the Service Provides)
@@ -25,7 +25,7 @@ series, regulatory reports, settlement netting, and surveillance analytics.
 | Trade ledger | Every execution as one-row-per-side with a shared trade id, liquidity attribution (maker/taker), price, quantity, and charges. |
 | Trade bust | Step-up-authorized cancellation of an erroneous/obviously-error/regulatorily-directed trade, idempotent and audited, with downstream fan-out. |
 | Trade amend (storage) | Persistent amend records correcting quantity/price/wash/principal flags with the amender's identity. |
-| Drop copy | Entitled, filtered real-time copies of order/trade events to clearing clients — fills-only or full mode, per-instrument and per-customer/trader filters, with reconnect resends. |
+| Drop copy | Entitled, filtered real-time copies of order/trade events to clearing clients - fills-only or full mode, per-instrument and per-customer/trader filters, with reconnect resends. |
 | Regulatory stream projection | Deduplicated, per-day-sequenced reportable order/trade events for the regulatory reporting chain. |
 | Short-sale locate (core) | Reg SHO locate ledger: borrow-inventory-backed approval, consumption at execution, and expiry of instrument-scoped locate authorizations. |
 | Drop-buffer purge (policy) | Retention-based deletion of the drop resend store (2555-day regulatory keep) executed via the scheduler proxy-back. |
@@ -57,14 +57,14 @@ series, regulatory reports, settlement netting, and surveillance analytics.
 | Charges at trade time | Commission tables (static and bps-tiered dynamic) are applied at trade time and stored on the trade row, feeding end-of-day records and netting. |
 | Cross orders | Cross extensions (cross type, contra account, price/quantity) are journaled for negotiated crosses. |
 | Replace tracking | Order replaces keep the original ↔ new client order id linkage so the history of an amended working order is unbroken. |
-| Anomaly preservation | If the engine misbehaves (duplicate side, same-liquidity pair, price/quantity mismatch), the data is still recorded and the anomaly flagged for repair — the record is never silently "fixed". |
+| Anomaly preservation | If the engine misbehaves (duplicate side, same-liquidity pair, price/quantity mismatch), the data is still recorded and the anomaly flagged for repair - the record is never silently "fixed". |
 
 ### Positions & lifecycle journal
 
 | Capability | Business rule |
 |---|---|
 | Order state history | Every order transition (new, booked, accepted, posted, cancel-pending, cancelled, traded, replace-pending, replace-done, repriced) is journaled with its one-letter code. |
-| Replaces keep lineage | A replace writes both the pending marker (original order) and the done marker (new order id) — the lineage is two entries, not an overwrite. |
+| Replaces keep lineage | A replace writes both the pending marker (original order) and the done marker (new order id) - the lineage is two entries, not an overwrite. |
 | Rejections are journaled | A rejected order enters the journal as new-pending then cancelled, so attempts are as visible as fills. |
 | Bust state on the trade | A busted trade keeps its original rows; the bust state flips to `busted` and a bust record preserves who busted, when, and why. |
 
@@ -82,7 +82,7 @@ series, regulatory reports, settlement netting, and surveillance analytics.
 
 | Capability | Business rule |
 |---|---|
-| Entitlement filtering | A drop session sees exactly what it is entitled to: customer, trader, and originating-connection junctions; book-token allow-lists; and instrument allow-lists — an empty filter means all. |
+| Entitlement filtering | A drop session sees exactly what it is entitled to: customer, trader, and originating-connection junctions; book-token allow-lists; and instrument allow-lists - an empty filter means all. |
 | Fills-only mode | A fills-only session receives executions (and busts) but no working-order events. |
 | Own sequences + resend | Each drop session has its own sequence per message and a persisted resend store, so a reconnecting client can recover a window of missed messages. |
 | Session states | Drop sessions are managed (enable/disable/halt) through their status and book tokens. |
@@ -95,8 +95,8 @@ series, regulatory reports, settlement netting, and surveillance analytics.
 | Event (family/naming) | When it fires |
 |---|---|
 | `exchange8:clearing:order:recorded` | Order lifecycle journaled (order recorded into the ledger). |
-| `exchange8:clearing:trade:busted` | A trade bust is applied — market data emits a broken-trade marker, gateway re-reports with cancel exec reports, drop buffers receive bust messages. |
-| `exchange8:clearing:trade:amended` | A trade amendment is applied — same fan-out pattern with corrected values. |
+| `exchange8:clearing:trade:busted` | A trade bust is applied - market data emits a broken-trade marker, gateway re-reports with cancel exec reports, drop buffers receive bust messages. |
+| `exchange8:clearing:trade:amended` | A trade amendment is applied - same fan-out pattern with corrected values. |
 | `exchange8:clearing:drop:sent` | Drop-copy messages are emitted to entitled sessions. |
 | `exchange8:clearing:trade:reported` / `exchange8:clearing:order:reported` | Reportable lifecycle events enter the regulatory stream projection. |
 | `exchange8:clearing:trade:novated` | Real-time CCP novation applied per trade (clearing-depth capability). |
@@ -142,7 +142,7 @@ relayed to Sentin8:Bus with the outbox row id as the idempotency key.
 9. **Retention keeps what regulators ask for.** The drop resend store is kept
    2555 days; purge never touches another service's message stores.
 10. **Replay is safe everywhere.** Event re-delivery, projector recovery, and
-    bust/drop replays dedupe on declared idempotency keys — reprocessing
+    bust/drop replays dedupe on declared idempotency keys - reprocessing
     never double-counts a trade, a bust, or a drop message.
 11. **Audit never lags the trade.** Mutations carry audit records pushed to
     the platform audit service, and an audit-service outage only delays, never
@@ -183,20 +183,20 @@ relayed to Sentin8:Bus with the outbox row id as the idempotency key.
 
 ## 8. Dependencies & Reliance on Other Services
 
-- **Exchange8:ME / Exchange8:Gateway / Exchange8:SOR / Exchange8:OMS** — authoritative order and
+- **Exchange8:ME / Exchange8:Gateway / Exchange8:SOR / Exchange8:OMS** - authoritative order and
   execution event producers; without their events there is no ledger.
-- **Sentin8:Bus** — event transport and consumer groups; outbox relay target.
-- **Sentin8:Auth** — token verification, M2M client registration (DCR),
+- **Sentin8:Bus** - event transport and consumer groups; outbox relay target.
+- **Sentin8:Auth** - token verification, M2M client registration (DCR),
   scopes.
-- **Shield (sentin8-policy) via the shell** — every authorization decision.
-- **Sentin8:Sys** — audit ingest and the hostname resolution used by the
+- **Shield (sentin8-policy) via the shell** - every authorization decision.
+- **Sentin8:Sys** - audit ingest and the hostname resolution used by the
   database-free TLS path.
-- **Sentin8:Cron** — executes the drop-buffer purge policy on schedule.
-- **Sentin8:DB (PostgreSQL 18, OAuth)** — persistence; the service's own
+- **Sentin8:Cron** - executes the drop-buffer purge policy on schedule.
+- **Sentin8:DB (PostgreSQL 18, OAuth)** - persistence; the service's own
   role in its own database, no BYPASSRLS anywhere.
-- **Securities-lending feed / prime-broker API (external)** — borrow
+- **Securities-lending feed / prime-broker API (external)** - borrow
   inventory that backs the locate ledger.
-- **Downstream consumers** — Exchange8:MD (broken trades), Exchange8:Gateway (FIX
+- **Downstream consumers** - Exchange8:MD (broken trades), Exchange8:Gateway (FIX
   re-reports), drop sessions; their correctness depends on Clearing's events
   being emitted exactly once.
 
@@ -226,7 +226,7 @@ relayed to Sentin8:Bus with the outbox row id as the idempotency key.
    without tenant context sees zero rows and an insert without context is
    rejected (probe-verified).
 10. A failed event relay retries and, past its budget, lands in the dead
-    letter queue with manual replay — no silent event loss.
+    letter queue with manual replay - no silent event loss.
 11. An audit-service outage leaves journal rows unpushed but durable, and
     they drain once the service recovers.
 12. Drop-buffer rows older than the retention window are removed by the
@@ -240,7 +240,7 @@ relayed to Sentin8:Bus with the outbox row id as the idempotency key.
   trades, or a distinct record class) is undecided.
 - **Drop-copy FIX transport sessions.** The entitlement engine and resend
   store exist, but the outbound FIX session management (session ops, trace
-  toggles, forced logout) is not yet operated by this service — who operates
+  toggles, forced logout) is not yet operated by this service - who operates
   the session layer and via which endpoint is open.
 - **Locate persistence and the borrowing desk feed.** The locate logic is
   proven in core, but no locate table or feed adapter is live; which storage
@@ -252,7 +252,7 @@ relayed to Sentin8:Bus with the outbox row id as the idempotency key.
   Exchange8:Settlement is an open scoping decision.
 - **Bust scope naming.** The platform-wide registered bust scope is
   `exchange8:trade:bust`; design materials also reference a
-  `bust:execute` variant — the business-facing permission name should be
+  `bust:execute` variant - the business-facing permission name should be
   settled once and reflected everywhere.
 - **Regulatory stream persistence boundary.** The deduplicated reportable
   projection exists here, while regulatory transport belongs to

@@ -823,7 +823,7 @@
         "tags": [
           "clearing"
         ],
-        "summary": "`GET /v1/orders` — the order day log (FIX_ORDER).",
+        "summary": "`GET /v1/orders` - the order day log (FIX_ORDER).",
         "operationId": "list_orders",
         "responses": {
           "200": {
@@ -849,7 +849,7 @@
         "tags": [
           "clearing"
         ],
-        "summary": "`GET /v1/trades` — list executions (RLS-scoped). Both per-side rows of a\ntrade carry the same `trade_id` (one-row-per-side shape).",
+        "summary": "`GET /v1/trades` - list executions (RLS-scoped). Both per-side rows of a\ntrade carry the same `trade_id` (one-row-per-side shape).",
         "operationId": "list_trades",
         "responses": {
           "200": {
@@ -875,7 +875,7 @@
         "tags": [
           "clearing"
         ],
-        "summary": "`POST /v1/trades/bust` — bust a trade (step-up auth: `exchange8:trade:bust`).",
+        "summary": "`POST /v1/trades/bust` - bust a trade (step-up auth: `exchange8:trade:bust`).",
         "description": "Idempotent per trade_id (`exchange8_bust_trade` unique on env+trade).",
         "operationId": "bust_trade",
         "responses": {

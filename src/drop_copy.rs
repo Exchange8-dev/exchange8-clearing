@@ -14,7 +14,7 @@
 //!   step-up auth decision shape, and the compensation projection to
 //!   positions/charges.
 //! - **Purge jobs**: retention window for the drop buffer
-//!   (`clearing.drop_message`) — the pure policy the Cron proxy-back runs.
+//!   (`clearing.drop_message`) - the pure policy the Cron proxy-back runs.
 //!   The gateway/md message stores' purge is the owning service's policy.
 //!
 //! Design: `design/sentin8-exchange8-clearing-technical-design.md` §4,
@@ -32,7 +32,7 @@ use exchange8::fixed::{Price, Qty};
 #[derive(Clone, Debug, PartialEq)]
 pub struct DropEntitlement {
     pub client_comp_id: String,
-    /// Fills-only (no order events) — the default entitlement mode.
+    /// Fills-only (no order events) - the default entitlement mode.
     pub fills_only: bool,
     /// Instruments the client is entitled to see (empty = all).
     pub instruments: Vec<u32>,
@@ -164,7 +164,7 @@ pub struct RegulatoryStream {
     emitted: std::collections::HashSet<(&'static str, u64)>,
     out: Vec<Reportable>,
     day_seq: u64,
-    /// Day boundary (µs) — rollover resets the sequence.
+    /// Day boundary (µs) - rollover resets the sequence.
     day_boundary_us: u64,
 }
 
@@ -178,7 +178,7 @@ impl RegulatoryStream {
         }
     }
 
-    /// Project one lifecycle event; dedup on (kind, id) — at-least-once
+    /// Project one lifecycle event; dedup on (kind, id) - at-least-once
     /// input, exactly-once output.
     pub fn project(&mut self, kind: &'static str, id: u64, instrument_id: u32, ts_us: u64) {
         if ts_us >= self.day_boundary_us {
@@ -229,7 +229,7 @@ pub enum BustOutcome {
         buyer_credit: i128,
         seller_debit: i128,
     },
-    /// Already busted (idempotent) — the bust stands as originally applied.
+    /// Already busted (idempotent) - the bust stands as originally applied.
     AlreadyBusted { trade_id: u64 },
     /// Unknown trade.
     Unknown,
@@ -307,7 +307,7 @@ pub struct Retention {
 
 /// Default retention policy for the drop buffer (7y regulatory keep).
 /// The gateway (`gateway.fix_message`) and md (`md.md_message`) stores
-/// declare their own retention under the owning service — never a
+/// declare their own retention under the owning service - never a
 /// cross-schema DELETE (design doc §1).
 pub const DEFAULT_RETENTION: &[Retention] = &[Retention {
     table: "clearing.drop_message",
@@ -443,7 +443,7 @@ mod tests {
             .iter()
             .find(|(t, _)| *t == "clearing.drop_message")
             .unwrap();
-        // 7y (2555 days) before `now` — the drop buffer's regulatory keep.
+        // 7y (2555 days) before `now` - the drop buffer's regulatory keep.
         assert_eq!(drop.1, now - 2555u64 * 86_400_000_000);
         // Saturating: early epoch → 0.
         let early = purge_cutoffs(DEFAULT_RETENTION, 1000);

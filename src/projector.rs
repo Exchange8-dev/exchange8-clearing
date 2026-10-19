@@ -3,13 +3,13 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Clearing
 // SPDX-License-Identifier: Apache-2.0
 
-// Exchange8:Clearing event projectors — the deterministic order/trade ledger.
+// Exchange8:Clearing event projectors - the deterministic order/trade ledger.
 //
 // Event-sourced: ME/SOR lifecycle events in → ledger rows out. The projectors
 // are pure functions of the event stream; the DB write layer and drop-copy
 // fan-out live in the service shell.
 //
-// Design: `design/sentin8-exchange8-clearing-technical-design.md` §4.1–4.2.
+// Design: `design/sentin8-exchange8-clearing-technical-design.md` §4.1-4.2.
 // Truth: `design/behavior-catalog/messages.json` (update type codes).
 
 use exchange8::contracts::enums::{Liquidity, Side};
@@ -23,25 +23,25 @@ use exchange8::fixed::{Price, Qty};
 /// One row per order lifecycle event (the platform spec codes).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum UpdateType {
-    /// `A` — new, pending.
+    /// `A` - new, pending.
     NewPending,
-    /// `B` — booked.
+    /// `B` - booked.
     Booked,
-    /// `P` — accepted.
+    /// `P` - accepted.
     Accepted,
-    /// `S` — posted.
+    /// `S` - posted.
     Posted,
-    /// `C` — cancel pending.
+    /// `C` - cancel pending.
     CancelPending,
-    /// `X` — cancelled.
+    /// `X` - cancelled.
     Cancelled,
-    /// `T` — traded.
+    /// `T` - traded.
     Traded,
-    /// `R` — replace pending.
+    /// `R` - replace pending.
     ReplacePending,
-    /// `M` — replace done.
+    /// `M` - replace done.
     ReplaceDone,
-    /// `I` — repriced.
+    /// `I` - repriced.
     Repriced,
 }
 
@@ -75,7 +75,7 @@ pub struct OrderUpdateRow {
     pub ts_us: u64,
 }
 
-/// Per-side trade record — the one-row-per-side `TRADE` shape is
+/// Per-side trade record - the one-row-per-side `TRADE` shape is
 /// preserved for clearing compatibility (both side-events share `trade_id`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TradeSideRow {
@@ -102,7 +102,7 @@ pub struct BustRow {
 
 /// bust reasons (`BUST_TRADE.Reason`). `ObviousError` and
 /// `Regulatory` are constructed by the shell's admin bust command handler
-/// (`POST /v1/admin/trades/bust`) — the projector test covers the projection
+/// (`POST /v1/admin/trades/bust`) - the projector test covers the projection
 /// path only, so they carry an explicit allow here.
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -261,7 +261,7 @@ impl Default for OrderProjector {
 /// Trade projector: ME `OrderExecuted` side-events → per-side trade rows.
 ///
 /// **Invariant (design §4.1)**: every ME execution emits TWO side-events
-/// sharing one `trade_id` — `Liquidity::Removed` (taker) and
+/// sharing one `trade_id` - `Liquidity::Removed` (taker) and
 /// `Liquidity::Added` (maker). The projector must see exactly one of each
 /// per trade id; a duplicate or a missing side is a projection gap alert.
 pub struct TradeProjector {
@@ -394,7 +394,7 @@ pub fn drop_matches(
     }
     if cfg.fills_only {
         // fills-only drops receive exactly the execution events (every trade
-        // side row is an execution) — no order-state events.
+        // side row is an execution) - no order-state events.
         return true;
     }
     true
