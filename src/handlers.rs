@@ -262,7 +262,7 @@ pub async fn list_orders(
     Ok(Json(rows))
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Authorization matrix tests (see DESIGN.md §9).
 //
 // DB-free: they exercise exactly the decision the handlers delegate to
@@ -270,7 +270,7 @@ pub async fn list_orders(
 // require, so a drifted constant or a changed platform semantics fails here
 // before it ships. Scope is the single authorization truth (architecture
 // principles §5).
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #[cfg(test)]
 mod scope_matrix {

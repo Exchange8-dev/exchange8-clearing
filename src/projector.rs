@@ -16,9 +16,9 @@ use exchange8::contracts::enums::{Liquidity, Side};
 use exchange8::contracts::events::{OrderBooked, OrderExecuted, OrderKilled, OrderModified};
 use exchange8::fixed::{Price, Qty};
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Ledger rows (pure data; the shell binds these to `exchange8_*` tables)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// One row per order lifecycle event (the platform spec codes).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -115,9 +115,9 @@ pub enum BustReason {
     Regulatory,
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Projectors
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Order projector: lifecycle events → order-update rows.
 ///
@@ -348,9 +348,9 @@ impl Default for TradeProjector {
     }
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Drop-copy fan-out filter (§4.2)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Drop-session entitlement configuration (one per `exchange8_drop_connection`).
 #[derive(Clone, Debug, Default)]
