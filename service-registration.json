@@ -6,7 +6,8 @@
       "telemetry_property": {
         "slug": "clearing",
         "name": "Exchange8:Clearing Telemetry"
-      }
+      },
+      "exposure": "internal"
     }
   ]
 }
